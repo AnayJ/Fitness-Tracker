@@ -42,9 +42,9 @@ def fitness_chat(request: ChatRequest,
         "bmi": user.bmi
     }
     
-    response = AIService.chat(request.message, user_data, request.history)
+    result = AIService.chat(request.message, user_data, request.history)
     
     return ChatResponse(
-        response=response,
-        suggested_action=None
+        response=result.get("response", ""),
+        suggested_action=result.get("suggested_action")
     )

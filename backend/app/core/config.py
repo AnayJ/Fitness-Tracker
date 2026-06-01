@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     # AI Services
     GEMINI_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
+    OLLAMA_API_URL: Optional[str] = None
+    OLLAMA_MODEL: Optional[str] = None
     
     # Server
     DEBUG: bool = False

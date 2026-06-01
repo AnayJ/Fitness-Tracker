@@ -1,21 +1,34 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { mealService } from '../services/api';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 
+const numberInputStyle = `
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+`;
+
 export default function MealEntry() {
-  const [meals, setMeals] = useState([
-    {
-      id: Date.now(),
-      name: '',
-      description: '',
-      calories: 0,
-      protein: 0,
-      carbs: 0,
-      fats: 0,
-    },
-  ]);
+  const nextMealId = useRef(Date.now());
+
+  const getNewMeal = () => ({
+    id: nextMealId.current++,
+    name: '',
+    description: '',
+    calories: '',
+    protein: '',
+    carbs: '',
+    fats: '',
+  });
+
+  const [meals, setMeals] = useState([getNewMeal()]);
   const [loading, setLoading] = useState(false);
   const { darkMode } = useTheme();
   const navigate = useNavigate();
@@ -29,18 +42,7 @@ export default function MealEntry() {
   };
 
   const addMealForm = () => {
-    setMeals((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        name: '',
-        description: '',
-        calories: 0,
-        protein: 0,
-        carbs: 0,
-        fats: 0,
-      },
-    ]);
+    setMeals((prev) => [...prev, getNewMeal()]);
   };
 
   const removeMealForm = (id) => {
@@ -72,13 +74,14 @@ export default function MealEntry() {
     }
   };
 
-  const totalCalories = meals.reduce((sum, meal) => sum + parseFloat(meal.calories || 0), 0);
-  const totalProtein = meals.reduce((sum, meal) => sum + parseFloat(meal.protein || 0), 0);
-  const totalCarbs = meals.reduce((sum, meal) => sum + parseFloat(meal.carbs || 0), 0);
-  const totalFats = meals.reduce((sum, meal) => sum + parseFloat(meal.fats || 0), 0);
+  const totalCalories = meals.reduce((sum, meal) => sum + (parseFloat(meal.calories) || 0), 0);
+  const totalProtein = meals.reduce((sum, meal) => sum + (parseFloat(meal.protein) || 0), 0);
+  const totalCarbs = meals.reduce((sum, meal) => sum + (parseFloat(meal.carbs) || 0), 0);
+  const totalFats = meals.reduce((sum, meal) => sum + (parseFloat(meal.fats) || 0), 0);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 p-4">
+      <style>{numberInputStyle}</style>
       <div className="max-w-2xl mx-auto">
         <button
           onClick={() => navigate('/dashboard')}
@@ -150,7 +153,7 @@ export default function MealEntry() {
                           handleMealChange(
                             meal.id,
                             'calories',
-                            parseFloat(e.target.value) || 0
+                            e.target.value
                           )
                         }
                         placeholder="0"
@@ -170,7 +173,7 @@ export default function MealEntry() {
                           handleMealChange(
                             meal.id,
                             'protein',
-                            parseFloat(e.target.value) || 0
+                            e.target.value
                           )
                         }
                         placeholder="0"
@@ -190,7 +193,7 @@ export default function MealEntry() {
                           handleMealChange(
                             meal.id,
                             'carbs',
-                            parseFloat(e.target.value) || 0
+                            e.target.value
                           )
                         }
                         placeholder="0"
@@ -210,7 +213,7 @@ export default function MealEntry() {
                           handleMealChange(
                             meal.id,
                             'fats',
-                            parseFloat(e.target.value) || 0
+                            e.target.value
                           )
                         }
                         placeholder="0"

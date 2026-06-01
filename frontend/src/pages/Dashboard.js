@@ -15,7 +15,7 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-import { LogOut, Plus, TrendingDown, MessageCircle, BarChart3, Moon, Sun } from 'lucide-react';
+import { LogOut, Plus, TrendingDown, MessageCircle, BarChart3, Moon, Sun, Trash2 } from 'lucide-react';
 
 ChartJS.register(
   CategoryScale,
@@ -35,6 +35,7 @@ export default function Dashboard() {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
+  const [chatSuggestedAction, setChatSuggestedAction] = useState(null);
   const { darkMode, toggleDarkMode } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -72,6 +73,7 @@ export default function Dashboard() {
         ...prev,
         { role: 'assistant', content: response.data.response },
       ]);
+      setChatSuggestedAction(response.data.suggested_action || null);
     } catch (error) {
       console.error('Error sending chat:', error);
     }
@@ -82,6 +84,19 @@ export default function Dashboard() {
     navigate('/login');
   };
 
+  const handleDeleteMeal = async (mealId) => {
+    if (!window.confirm('Are you sure you want to delete this meal?')) {
+      return;
+    }
+
+    try {
+      await mealService.deleteMeal(mealId);
+      await loadDashboard();
+    } catch (error) {
+      console.error('Error deleting meal:', error);
+      alert('Failed to delete meal');
+    }
+  };
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
@@ -262,9 +277,18 @@ export default function Dashboard() {
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h3 className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{meal.name}</h3>
-                        <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-sm font-semibold">
-                          {Math.round(meal.calories)} cal
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-sm font-semibold">
+                            {Math.round(meal.calories)} cal
+                          </span>
+                          <button
+                            onClick={() => handleDeleteMeal(meal.id)}
+                            className="text-red-600 hover:text-red-700 transition p-1"
+                            title="Delete meal"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
                       </div>
                       {meal.description && (
                         <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>{meal.description}</p>
@@ -283,17 +307,25 @@ export default function Dashboard() {
 
           {/* Right Column - AI Chat */}
           <div className="lg:col-span-1">
-            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-4 h-full flex flex-col sticky top-4`}>
-              <h2 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-800'} mb-2 flex items-center gap-2`}>
+            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-4 flex flex-col sticky top-4 max-h-[calc(100vh-120px)]`}>
+              <h2 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-800'} mb-2 flex items-center gap-2 flex-shrink-0`}>
                 <MessageCircle size={20} />
                 Fitness AI
               </h2>
 
-              <div className={`flex-1 overflow-y-auto mb-4 space-y-2 p-3 rounded-lg ${
+              <div className={`flex-1 overflow-y-auto space-y-2 p-3 rounded-lg min-h-0 ${
                 darkMode ? 'bg-gray-900' : 'bg-gray-50'
               }`}>
+                <div className={`rounded-lg p-2 text-xs ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700'}`}>
+                  Try asking: "What are my maintenance calories?", "How many calories should I eat for a deficit?", or "Help me calculate daily macros."
+                </div>
+                {chatSuggestedAction && (
+                  <div className={`rounded-lg p-2 text-sm font-medium ${darkMode ? 'bg-indigo-700 text-indigo-100' : 'bg-indigo-100 text-indigo-900'}`}>
+                    {chatSuggestedAction}
+                  </div>
+                )}
                 {chatHistory.length === 0 && (
-                  <p className={`${darkMode ? 'text-gray-500' : 'text-gray-500'} text-sm text-center py-8`}>
+                  <p className={`${darkMode ? 'text-gray-500' : 'text-gray-500'} text-sm text-center py-4`}>
                     Ask me anything about your fitness journey!
                   </p>
                 )}
@@ -311,7 +343,7 @@ export default function Dashboard() {
                 ))}
               </div>
 
-              <form onSubmit={handleSendChat} className="flex gap-2">
+              <form onSubmit={handleSendChat} className="flex gap-2 flex-shrink-0 mt-2">
                 <input
                   type="text"
                   value={chatMessage}

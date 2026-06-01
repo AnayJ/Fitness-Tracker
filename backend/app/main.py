@@ -96,7 +96,6 @@ def ai_get_current_user(token: str = Depends(get_token_from_header), db = Depend
     db = next(get_db())
     return ai.get_current_user(token, db)
 
-# Register all routers
 app.include_router(users_router)
 app.include_router(meals_router)
 app.include_router(dashboard_router)

@@ -33,7 +33,7 @@ A full-stack fitness tracking application built with React, FastAPI, and Postgre
 - **Scikit-learn**: ML predictions
 
 ### AI/ML
-- **Gemini/OpenAI API**: LLM integration for AI suggestions
+- **OLLAMA**: LLM integration for AI suggestions
 - **Linear Regression**: Calorie consumption predictions
 - **Rule-based System**: Fallback recommendations
 

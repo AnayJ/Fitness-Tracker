@@ -28,6 +28,21 @@ export default function Onboarding() {
     return (weight / (heightM * heightM)).toFixed(2);
   };
 
+  const calculateMaintenance = (weight, height, age = 30, gender = 'M') => {
+    // Mifflin-St Jeor approximation used in backend (same defaults)
+    const w = parseFloat(weight);
+    const h = parseFloat(height);
+    const a = parseFloat(age);
+    if (!w || !h) return 2000;
+    let bmr;
+    if ((gender || 'M').toUpperCase() === 'M') {
+      bmr = 10 * w + 6.25 * h - 5 * a + 5;
+    } else {
+      bmr = 10 * w + 6.25 * h - 5 * a - 161;
+    }
+    return Math.round(bmr * 1.55);
+  };
+
   const getAISuggestion = async () => {
     if (!formData.weight || !formData.height) {
       alert('Please enter weight and height');
@@ -190,7 +205,11 @@ export default function Onboarding() {
                 ].map(({ value, label, icon: Icon }) => (
                   <button
                     key={value}
-                    onClick={() => setFormData((prev) => ({ ...prev, fitnessGoal: value }))}
+                    onClick={() => {
+                      const maintenance = calculateMaintenance(formData.weight, formData.height);
+                      const target = value === 'lose' ? Math.round(maintenance * 0.85) : value === 'gain' ? Math.round(maintenance * 1.15) : maintenance;
+                      setFormData((prev) => ({ ...prev, fitnessGoal: value, targetCalories: target }));
+                    }}
                     className={`w-full p-4 rounded-lg border-2 flex items-center gap-3 transition ${
                       formData.fitnessGoal === value
                         ? 'border-indigo-600 bg-indigo-50'

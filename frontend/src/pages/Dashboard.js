@@ -228,7 +228,7 @@ export default function Dashboard() {
             <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
               <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Macro Breakdown</h2>
               <div className="flex justify-center mb-4">
-                <div style={{ width: '250px', height: '250px' }}>
+                <div className="w-40 h-40 md:w-60 md:h-60">
                   <Doughnut data={macroData} options={{ maintainAspectRatio: true }} />
                 </div>
               </div>
@@ -304,8 +304,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Right Column - AI Chat */}
-          <div className="lg:col-span-1">
+          {/* Right Column - AI Chat (hidden on small screens for clarity) */}
+          <div className="lg:col-span-1 hidden lg:block">
             <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-4 flex flex-col sticky top-4 max-h-[calc(100vh-120px)]`}>
               <h2 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-800'} mb-2 flex items-center gap-2 flex-shrink-0`}>
                 <MessageCircle size={20} />

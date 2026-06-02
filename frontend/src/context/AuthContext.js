@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useCallback
 } from 'react';
-import { authService } from '../services/api';
+import { authService, userService } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -19,7 +19,14 @@ const verifyToken = useCallback(async () => {
     const response = await authService.verifyToken(token);
 
     if (response.data.valid) {
-      setUser({ id: response.data.user_id });
+      // fetch full profile so UI shows name and other fields
+      try {
+        const profile = await userService.getProfile();
+        setUser(profile.data);
+      } catch (err) {
+        // fallback to minimal info
+        setUser({ id: response.data.user_id });
+      }
     }
   } catch (error) {
     localStorage.removeItem('access_token');

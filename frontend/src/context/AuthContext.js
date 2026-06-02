@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback
+} from 'react';
 import { authService } from '../services/api';
 
 const AuthContext = createContext();
@@ -8,28 +14,28 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('access_token'));
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { 
-    // Check if token exists and is valid
-    if (token) {
-      verifyToken();
-    } else {
-      setLoading(false);
-    }
-  }, [token,verifyToken]);
+const verifyToken = useCallback(async () => {
+  try {
+    const response = await authService.verifyToken(token);
 
-  const verifyToken = async () => {
-    try {
-      const response = await authService.verifyToken(token);
-      if (response.data.valid) {
-        setUser({ id: response.data.user_id });
-      }
-    } catch (error) {
-      localStorage.removeItem('access_token');
-      setToken(null);
-    } finally {
-      setLoading(false);
+    if (response.data.valid) {
+      setUser({ id: response.data.user_id });
     }
-  };
+  } catch (error) {
+    localStorage.removeItem('access_token');
+    setToken(null);
+  } finally {
+    setLoading(false);
+  }
+}, [token]);
+
+useEffect(() => {
+  if (token) {
+    verifyToken();
+  } else {
+    setLoading(false);
+  }
+}, [token, verifyToken]);
 
   const register = async (name, email, password) => {
     try {

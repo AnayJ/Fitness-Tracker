@@ -132,6 +132,31 @@ Respond as a helpful fitness assistant."""
         }
 
     @staticmethod
+    def _rule_based_goal_suggestion(bmi: float, maintenance_calories: float) -> dict:
+        """Rule-based fitness goal suggestion when AI services are unavailable."""
+        if bmi < 18.5:
+            goal = "gain"
+            explanation = "Your BMI is below normal range. Consider a slight calorie surplus to build healthy weight."
+            projection = "Approximately 0.25-0.5 kg/week"
+        elif bmi >= 25:
+            goal = "lose"
+            explanation = "Your BMI is above normal range. A moderate calorie deficit can help you reach a healthier weight."
+            projection = "Approximately 0.25-0.5 kg/week"
+        else:
+            goal = "maintain"
+            explanation = "Your BMI is in the normal range. Focus on maintaining your current weight with balanced nutrition."
+            projection = "Approximately 0 kg/week"
+
+        target_calories = maintenance_calories * (0.85 if goal == "lose" else 1.15 if goal == "gain" else 1.0)
+        
+        return {
+            "suggested_goal": goal,
+            "explanation": explanation,
+            "target_calories": target_calories,
+            "weekly_projection": projection,
+        }
+
+    @staticmethod
     def _rule_based_calorie_goal(user_data: dict, message_lower: str) -> Dict[str, Optional[str]]:
         maintenance = user_data.get("maintenance_calories") if user_data else None
         if not maintenance and user_data and user_data.get("weight") and user_data.get("height"):

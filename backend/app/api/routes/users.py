@@ -1,5 +1,5 @@
 """User routes."""
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.schemas.schemas import UserResponse, UserProfile, UserOnboarding, AIGoalResponse
@@ -72,7 +72,7 @@ def complete_onboarding(onboarding_data: UserOnboarding,
 
 
 @router.post("/suggest-goal", response_model=AIGoalResponse)
-def suggest_goal(weight: float, height: float, 
+def suggest_goal(weight: float = Query(...), height: float = Query(...),
                 db: Session = Depends(get_db),
                 user = Depends(get_current_user)):
     """Get AI suggested fitness goal."""

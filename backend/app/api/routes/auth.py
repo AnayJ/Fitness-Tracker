@@ -1,5 +1,5 @@
 """Authentication routes."""
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.db.database import get_db
@@ -44,8 +44,8 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
 
 
 @router.post("/verify")
-def verify_token(token: str):
-    """Verify if a token is valid."""
+def verify_token(token: str = Body(..., embed=True)):
+    """Verify if a token is valid. Accepts JSON body {"token": "..."}."""
     payload = decode_token(token)
     if not payload:
         raise HTTPException(

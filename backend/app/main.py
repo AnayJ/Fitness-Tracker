@@ -16,6 +16,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
+origins = [
+    "http://localhost:3000",
+    "https://fitness-tracker.vercel.app",
+]
+
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,

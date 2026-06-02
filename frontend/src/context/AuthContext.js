@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
   const verifyToken = async () => {
     try {

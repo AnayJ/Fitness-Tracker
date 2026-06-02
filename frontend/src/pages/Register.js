@@ -32,7 +32,7 @@ export default function Register() {
     }
 
     try {
-      const user = await register(formData.name, formData.email, formData.password);
+      await register(formData.name, formData.email, formData.password);
       navigate('/onboarding');
     } catch (err) {
       setError(err.detail || 'Registration failed. Please try again.');

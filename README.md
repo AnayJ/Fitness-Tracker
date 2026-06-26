@@ -148,6 +148,8 @@ pip install -r requirements.txt
 
 4. **Setup environment variables**
 ```bash
+
+copy .env.example .env(in Windows)
 cp .env.example .env
 # Edit .env with your PostgreSQL credentials and API keys
 ```
@@ -178,6 +180,7 @@ npm install
 
 3. **Setup environment variables**
 ```bash
+copy .env.example .env(in Windows)
 cp .env.example .env
 # Make sure REACT_APP_API_URL points to your backend
 ```
